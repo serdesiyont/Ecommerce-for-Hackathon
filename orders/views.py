@@ -159,3 +159,55 @@ def order_complete(request):
         return render(request, 'orders/order_complete.html', context)
     except (Payment.DoesNotExist, Order.DoesNotExist):
         return redirect('home')
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Order
+from carts.models import CartItem
+import requests
+
+def order_complete(request):
+    order_number = request.GET.get('order_number')
+    try:
+        order = Order.objects.get(order_number=order_number)
+        ordered_products = order.orderproduct_set.all()
+
+        context = {
+            'order': order,
+            'ordered_products': ordered_products,
+        }
+        return render(request, 'orders/order_complete.html', context)
+    except Order.DoesNotExist:
+        return redirect('home')
+
+@csrf_exempt
+def chapa_callback(request):
+    if request.method == 'POST':
+        data = request.POST
+        tx_ref = data.get('tx_ref')
+        status = data.get('status')
+
+        if status == 'success':
+            # Verify the payment with Chapa
+            response = requests.get(f'https://api.chapa.co/v1/transaction/verify/{tx_ref}', headers={
+ 'Authorization': 'Bearer YOUR_SECRET_KEY'
+            })
+            result = response.json()
+
+            if result['status'] == 'success':
+                # Payment is verified, place the order
+                order = get_object_or_404(Order, tx_ref=tx_ref)
+                order.status = 'Completed'
+                order.save()
+
+                # Clear the cart
+                cart_items = CartItem.objects.filter(user=order.user)
+                cart_items.delete()
+
+                return redirect('order_complete', order_number=order.order_number)
+            else:
+                return JsonResponse({'error': 'Payment verification failed'}, status=400)
+        else:
+            return JsonResponse({'error': 'Payment failed'}, status=400)
+    return JsonResponse({'error': 'Invalid request'}, status=400)

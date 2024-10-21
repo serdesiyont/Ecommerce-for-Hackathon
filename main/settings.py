@@ -25,7 +25,7 @@ SECRET_KEY = '52$5ujr925j_8)+c4+yhwik_+vq6e13#fxi5**_$rv80pn3(sf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['greatkart-course-env.eba-rj3mtu3q.us-west-2.elasticbeanstalk.com', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -85,11 +85,14 @@ CHAPA_SECRET = 'CHAPUBK_TEST-AS31hgob0uC1ZDdvloaj5kQFutrc0ijs'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'ecomforhack',
+        'USER': 'postgres',
+        'PASSWORD': 'S3rv3post',
+        'HOST': 'localhost',
+        'PORT': '5432'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -145,8 +148,8 @@ MESSAGE_TAGS = {
 
 
 # SMTP configuration
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'rathan.kumar049@gmail.com'
-EMAIL_HOST_PASSWORD = 'Giveme99$'
-EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'serdesiyon@gmail.com'
+# EMAIL_HOST_PASSWORD = 'workgmail@19'
+# EMAIL_USE_TLS = True
